@@ -213,7 +213,8 @@ class GeminiFoodDetector:
         9. Analiza la composición general de la comida con recomendaciones de salud EN ESPAÑOL
         10. Proporciona una puntuación de salud (1-10) basada en el equilibrio nutricional
         11. Sé lo más preciso posible con todas las estimaciones
-        12. TODAS las descripciones, recomendaciones y textos descriptivos deben estar en ESPAÑOL
+        12. TODAS las descripciones, recomendaciones, cuisine_type y textos descriptivos deben estar en ESPAÑOL
+        13. Para cuisine_type usa términos en español: "peruana", "italiana", "mexicana", "china", "japonesa", etc.
 
         Devuelve SOLO la respuesta JSON, sin texto adicional o formato markdown.
         """
