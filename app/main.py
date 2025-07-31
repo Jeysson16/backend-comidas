@@ -29,11 +29,11 @@ async def add_cors_headers(request: Request, call_next):
     response.headers["Access-Control-Expose-Headers"] = "*"
     return response
 
-# Configurar CORS - Más permisivo para desarrollo y testing
+# Configurar CORS - Usar configuración de variables de entorno
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permitir todos los orígenes para testing
-    allow_credentials=False,  # Cambiar a False para mayor compatibilidad
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=False,  # False para mayor compatibilidad con herramientas
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"],
