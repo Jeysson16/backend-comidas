@@ -1,0 +1,21 @@
+# Core Framework
+fastapi==0.104.1
+uvicorn==0.24.0
+
+# Google Gemini AI
+google-generativeai==0.8.5
+
+# File Handling
+python-multipart==0.0.6
+pillow==10.1.0
+
+# Configuration
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# HTTP & Requests
+requests==2.31.0
+httpx==0.25.2
+
+# Data Processing
+numpy==1.25.2
