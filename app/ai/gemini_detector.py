@@ -8,7 +8,6 @@ import json
 import logging
 from typing import Dict, List, Optional, Tuple
 import requests
-from PIL import Image
 import io
 
 from app.core.config import settings
