@@ -147,14 +147,15 @@ class GeminiFoodDetector:
     def _create_food_analysis_prompt(self) -> str:
         """Create an optimized prompt for comprehensive food analysis."""
         return """
-        Analiza esta imagen de comida y proporciona una respuesta JSON detallada con la siguiente estructura:
+        Analiza esta imagen de comida y proporciona una respuesta JSON detallada con la siguiente estructura.
+        IMPORTANTE: Todas las descripciones, recomendaciones y textos deben estar en ESPAÑOL.
 
         {
             "dish_identification": {
                 "dish_name": "nombre_del_plato_principal",
                 "dish_type": "ceviche/ensalada/guiso/etc",
                 "cuisine_type": "peruana/italiana/mexicana/etc",
-                "description": "Descripción breve del plato identificado"
+                "description": "Descripción breve del plato identificado EN ESPAÑOL"
             },
             "foods_detected": [
                 {
@@ -196,7 +197,7 @@ class GeminiFoodDetector:
                 "nutritional_balance": "equilibrado/alto_carbohidratos/alta_proteina/alta_grasa",
                 "health_score": 8.5,
                 "macronutrient_units": "Todos los macronutrientes (proteína, carbohidratos, grasa, fibra) están expresados en gramos (g). Sodio en miligramos (mg). Calorías en kilocalorías (kcal).",
-                "recommendations": ["Agregar más vegetales", "Buen contenido de proteína"]
+                "recommendations": ["Recomendaciones de salud EN ESPAÑOL", "Ejemplo: Excelente fuente de proteína"]
             }
         }
 
@@ -209,9 +210,10 @@ class GeminiFoodDetector:
         6. Proporciona coordenadas de bounding box como porcentajes (0.0 a 1.0)
         7. Calcula valores nutricionales precisos por 100g Y totales para la porción estimada
         8. INCLUYE las unidades en el análisis nutricional para claridad
-        9. Analiza la composición general de la comida con recomendaciones de salud
+        9. Analiza la composición general de la comida con recomendaciones de salud EN ESPAÑOL
         10. Proporciona una puntuación de salud (1-10) basada en el equilibrio nutricional
         11. Sé lo más preciso posible con todas las estimaciones
+        12. TODAS las descripciones, recomendaciones y textos descriptivos deben estar en ESPAÑOL
 
         Devuelve SOLO la respuesta JSON, sin texto adicional o formato markdown.
         """
