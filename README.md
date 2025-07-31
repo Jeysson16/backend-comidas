@@ -77,122 +77,104 @@ DEBUG=false
 
 ### Endpoint principal: `POST /api/v1/ai/test-detection`
 
-## Estructura de la respuesta del endpoint de detección
-
-Al enviar una imagen al endpoint `/api/v1/ai/test-detection`, la respuesta tendrá la siguiente estructura:
-
 ```json
 {
-  "success": true,
-  "detection_result": {
-    "dish_identification": {
-      "dish_name": "Nombre del plato",
-      "dish_type": "Tipo de plato",
-      "cuisine_type": "Tipo de cocina",
-      "description": "Descripción del plato"
-    },
-    "detections": [
-      {
-        "class": "Nombre del alimento",
-        "confidence": 0.95,
-        "bbox": [x, y, ancho, alto],
-        "estimated_weight": 150,
-        "nutrition": {
-          "calories": 248,
-          "protein": 46.5,
-          "carbs": 0,
-          "fat": 5.4,
-          "fiber": 0,
-          "sodium": 120
-        },
-        "nutrition_per_100g": {
-          "calories": 165,
-          "protein": 31,
-          "carbs": 0,
-          "fat": 3.6,
-          "fiber": 0,
-          "sodium": 80
-        },
-        "portion_size": "mediana"
-      }
-    ],
-    "meal_analysis": {
-      "meal_type": "Tipo de comida",
-      "total_calories": 431,
-      "total_protein_grams": 51.9,
-      "total_carbs_grams": 39.2,
-      "total_fat_grams": 6.1,
-      "total_fiber_grams": 2.6,
-      "nutritional_balance": "Balance nutricional",
-      "health_score": 8.5,
-      "macronutrient_units": "Todos los macronutrientes (proteína, carbohidratos, grasa, fibra) están expresados en gramos (g). Sodio en miligramos (mg). Calorías en kilocalorías (kcal).",
-      "recommendations": ["Recomendación 1", "Recomendación 2"]
-    },
-    "total_items": 3,
-    "confidence_avg": 0.88,
-    "nutrition_source": "gemini_enhanced"
+  "dish_identification": {
+    "name": "Ensalada mixta",
+    "confidence": 0.95,
+    "cuisine_type": "Mediterránea"
   },
-  "filename": "nombre_archivo.jpg",
-  "message": "Detección completada exitosamente"
+  "detections": [
+    {
+      "class": "lechuga",
+      "confidence": 0.92,
+      "bbox": [0.1, 0.2, 0.8, 0.7],
+      "estimated_weight": 50,
+      "nutrition": {
+        "calories": 8,
+        "protein": 0.9,
+        "carbs": 1.5,
+        "fat": 0.1,
+        "fiber": 1.0
+      },
+      "nutrition_per_100g": {
+        "calories": 15,
+        "protein": 1.8,
+        "carbs": 3.0,
+        "fat": 0.2,
+        "fiber": 2.0
+      }
+    }
+  ],
+  "meal_analysis": {
+    "total_calories": 150,
+    "total_protein": 8.5,
+    "total_carbs": 20.0,
+    "total_fat": 5.2,
+    "health_score": 8.5,
+    "recommendations": ["Excelente fuente de fibra", "Bajo en calorías"]
+  }
 }
 ```
 
-### Notas sobre la respuesta
+## 🔗 Endpoints disponibles
 
-- **bbox**: Coordenadas normalizadas [x, y, ancho, alto] que representan la ubicación del alimento en la imagen (valores entre 0 y 1)
-- **estimated_weight**: Peso estimado en gramos
-- **nutrition**: Valores nutricionales para la porción detectada
-- **nutrition_per_100g**: Valores nutricionales por 100g del alimento
-- **macronutrient_units**: Unidades de medida para los valores nutricionales
-  - Proteína, carbohidratos, grasa, fibra: gramos (g)
-  - Sodio: miligramos (mg)
-  - Calorías: kilocalorías (kcal)
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/` | Información del sistema |
+| `GET` | `/docs` | Documentación interactiva |
+| `GET` | `/health` | Estado de salud |
+| `POST` | `/api/v1/ai/test-detection` | Detección de alimentos |
+| `GET` | `/api/v1/ai/supported-foods` | Alimentos soportados |
 
-## Endpoints disponibles
+## 📱 Uso con Flutter
 
-- `GET /`: Información general del sistema
-- `GET /health`: Verificación de salud del sistema
-- `GET /system-info`: Información detallada del sistema
-- `GET /api/v1/ai/model-info`: Información del modelo Gemini
-- `GET /api/v1/ai/supported-foods`: Alimentos soportados
-- `GET /api/v1/ai/nutrition-database`: Base de datos nutricional
-- `GET /api/v1/ai/gemini-status`: Estado de Gemini
-- `GET /api/v1/ai/system-health`: Salud del sistema de IA
-- `POST /api/v1/ai/test-detection`: Detección de alimentos en una imagen
-backend_comidas/
-├── app/
-│   ├── api/              # Endpoints de la API
-│   ├── core/             # Configuración y seguridad
-│   ├── models/           # Modelos de base de datos
-│   ├── schemas/          # Esquemas Pydantic
-│   ├── services/         # Lógica de negocio
-│   ├── ai/               # Módulos de IA
-│   └── main.py           # Aplicación principal
-├── alembic/              # Migraciones de BD
-├── tests/                # Pruebas
-└── requirements.txt      # Dependencias
+```dart
+import 'package:http/http.dart' as http;
+
+class ApiService {
+  static const String baseUrl = 'https://backend-comidas-jeysson16.vercel.app';
+  
+  Future<Map<String, dynamic>> detectFood(File imageFile) async {
+    var request = http.MultipartRequest(
+      'POST', 
+      Uri.parse('$baseUrl/api/v1/ai/test-detection')
+    );
+    
+    request.files.add(
+      await http.MultipartFile.fromPath('file', imageFile.path)
+    );
+    
+    var response = await request.send();
+    var responseData = await response.stream.bytesToString();
+    
+    return json.decode(responseData);
+  }
+}
 ```
 
-## Funcionalidades Principales
+## 📈 Monitoreo
 
-### 1. Análisis de Imágenes con IA
-- Detección automática de alimentos en fotos
-- Estimación de porciones y macronutrientes
-- Sugerencias inteligentes
+- **Logs en tiempo real**: Dashboard de Vercel
+- **Métricas de uso**: Analytics integrado
+- **Health checks**: Endpoint `/health`
+- **Documentación**: Siempre actualizada en `/docs`
 
-### 2. Sistema de Aprendizaje Adaptativo
-- Cálculo automático de TDEE
-- Ajuste dinámico de objetivos
-- Aprendizaje basado en adherencia
+## 🤝 Contribuir
 
-### 3. API Endpoints
-- `/auth/` - Autenticación y usuarios
-- `/meals/` - Registro y gestión de comidas
-- `/analysis/` - Análisis de imágenes
-- `/progress/` - Tracking y estadísticas
-- `/sync/` - Sincronización offline
+1. Fork el repositorio
+2. Crea una rama para tu feature
+3. Commit tus cambios
+4. Push a la rama
+5. Abre un Pull Request
 
-## Uso de la API
-La documentación interactiva estará disponible en:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+## 📄 Licencia
+
+MIT License - ver archivo LICENSE para detalles.
+
+---
+
+**Desarrollado con ❤️ para aplicaciones móviles Flutter**
+# backend-comidas
+Backend especializado en detección de alimentos usando Google Gemini 1.5 Flash que permite: - Detección avanzada de alimentos con IA - Análisis nutricional automático - Alta precisión en reconocimiento - API optimizada solo para IA
+>>>>>>> b3fa33dc7e19306dee5cc3c32bfd6caf5db38a03
