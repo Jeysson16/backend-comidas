@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
@@ -19,13 +19,24 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Configurar CORS
+# Middleware personalizado para headers CORS adicionales
+@app.middleware("http")
+async def add_cors_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Expose-Headers"] = "*"
+    return response
+
+# Configurar CORS - Más permisivo para desarrollo y testing
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_origins=["*"],  # Permitir todos los orígenes para testing
+    allow_credentials=False,  # Cambiar a False para mayor compatibilidad
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Crear directorio de uploads si no existe
@@ -43,6 +54,11 @@ async def startup_event():
     logger.info("Iniciando Food Detection API...")
     logger.info("Backend especializado en IA para detección de alimentos")
     logger.info("Base de datos: Manejada por el frontend con Firebase")
+
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """Manejar solicitudes OPTIONS para CORS preflight"""
+    return {"message": "OK"}
 
 @app.get("/")
 async def root():
