@@ -1,45 +1,47 @@
-node_modules/
+# Archivos de entorno
 .env
-.env.local
-.env.production
-.env.staging
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.DS_Store
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+.env.*
+!.env.example
 
-# Vercel
-.vercel
-
-# Python (legacy)
+# Archivos de caché de Python
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
 
-# Uploads
-uploads/
-temp/
+# Distribución / empaquetado
+dist/
+build/
+*.egg-info/
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+
+# Base de datos SQLite
+*.db
+*.sqlite3
+
+# Archivos de registro
+*.log
+
+# Archivos de imagen de prueba
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+
+# Carpeta de uploads
+uploads/*
+!uploads/.gitkeep
+
+# Archivos específicos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos específicos del sistema operativo
+.DS_Store
+Thumbs.db
