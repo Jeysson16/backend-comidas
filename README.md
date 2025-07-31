@@ -1,62 +1,81 @@
-# Food Detection API con Google Gemini
+# Food Detection API 🍽️
 
-## Descripción
-Backend especializado en detección de alimentos usando Google Gemini 1.5 Flash que permite:
-- Detección avanzada de alimentos con IA
-- Análisis nutricional automático
-- Alta precisión en reconocimiento
-- API optimizada solo para IA
+API especializada en detección de alimentos usando Google Gemini 1.5 Flash, optimizada para aplicaciones móviles Flutter.
 
-## Tecnologías
-- **FastAPI**: Framework web moderno y rápido
-- **Google Gemini 1.5 Flash**: Modelo de IA para detección de alimentos
-- **Vercel**: Plataforma de despliegue
+## 🚀 Despliegue rápido en Vercel
 
-## Instalación
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Jeysson16/backend-comidas&env=GEMINI_API_KEY&envDescription=API%20Key%20de%20Google%20Gemini%20requerida&envLink=https://makersuite.google.com/app/apikey)
 
-1. Crear entorno virtual:
+## 📱 Características
+
+- ✅ **Detección avanzada de alimentos** con IA
+- ✅ **Análisis nutricional automático**
+- ✅ **Estimación de porciones** por peso
+- ✅ **API optimizada** para aplicaciones móviles
+- ✅ **CORS configurado** para Flutter
+- ✅ **Respuestas estructuradas** en JSON
+- ✅ **Documentación interactiva** con Swagger
+
+## 🛠️ Tecnologías
+
+- **Backend**: FastAPI + Python 3.11
+- **IA**: Google Gemini 1.5 Flash
+- **Despliegue**: Vercel
+- **Documentación**: Swagger UI automática
+
+## 📋 Requisitos
+
+- Python 3.11+
+- API Key de Google Gemini ([Obtener aquí](https://makersuite.google.com/app/apikey))
+
+## 🚀 Instalación local
+
 ```bash
-python -m venv venv
-venv\Scripts\activate  # Windows
-```
+# Clonar repositorio
+git clone https://github.com/Jeysson16/backend-comidas.git
+cd backend-comidas
 
-2. Instalar dependencias:
-```bash
+# Instalar dependencias
 pip install -r requirements.txt
+
+# Configurar variables de entorno
+cp .env.example .env
+# Editar .env y agregar tu GEMINI_API_KEY
+
+# Ejecutar servidor
+python run.py
 ```
 
-3. Configurar variables de entorno (crear .env):
-```
-GEMINI_API_KEY=tu_api_key_de_gemini
-CORS_ORIGINS=http://localhost:3000,http://localhost:8080,http://localhost:5173
-```
+La API estará disponible en: `http://localhost:8000`
 
-4. Iniciar servidor:
+## 🌐 Despliegue en Vercel desde GitHub
+
+### Opción 1: Un click (Recomendado)
+1. Haz fork de este repositorio
+2. Click en el botón "Deploy with Vercel" arriba
+3. Conecta tu cuenta de GitHub
+4. Agrega tu `GEMINI_API_KEY`
+5. ¡Listo! 🎉
+
+### Opción 2: Manual
+1. Sube tu código a GitHub
+2. Ve a [vercel.com](https://vercel.com)
+3. Importa tu repositorio
+4. Configura las variables de entorno
+5. Despliega automáticamente
+
+## 🔑 Variables de entorno requeridas
+
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+GEMINI_API_KEY=tu_api_key_aqui
+CORS_ORIGINS=*  # Para aplicaciones móviles
+ENVIRONMENT=production
+DEBUG=false
 ```
 
-## Despliegue en Vercel
+## 📊 Estructura de respuesta
 
-1. Clona este repositorio
-2. Instala la CLI de Vercel: `npm i -g vercel`
-3. Ejecuta `vercel login` y sigue las instrucciones
-4. Ejecuta `vercel` en la raíz del proyecto
-5. Configura las variables de entorno en Vercel:
-   - `GEMINI_API_KEY`: Tu API key de Google Gemini
-   - `CORS_ORIGINS`: Lista de dominios permitidos separados por comas
-
-## Estructura del Proyecto
-```
-/app
-  /ai              # Módulos de IA para detección de alimentos
-  /api             # Endpoints de la API
-  /core            # Configuración y utilidades
-  /models          # Modelos de datos
-  /schemas         # Esquemas de validación
-  /services        # Servicios de la aplicación
-  main.py          # Punto de entrada de la aplicación
-```
+### Endpoint principal: `POST /api/v1/ai/test-detection`
 
 ## Estructura de la respuesta del endpoint de detección
 

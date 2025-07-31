@@ -4,7 +4,7 @@ API especializada en detección de alimentos usando Google Gemini 1.5 Flash, opt
 
 ## 🚀 Despliegue rápido en Vercel
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/TU_USUARIO/backend-comidas&env=GEMINI_API_KEY&envDescription=API%20Key%20de%20Google%20Gemini%20requerida&envLink=https://makersuite.google.com/app/apikey)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Jeysson16/backend-comidas&env=GEMINI_API_KEY&envDescription=API%20Key%20de%20Google%20Gemini%20requerida&envLink=https://makersuite.google.com/app/apikey)
 
 ## 📱 Características
 
@@ -32,7 +32,7 @@ API especializada en detección de alimentos usando Google Gemini 1.5 Flash, opt
 
 ```bash
 # Clonar repositorio
-git clone https://github.com/TU_USUARIO/backend-comidas.git
+git clone https://github.com/Jeysson16/backend-comidas.git
 cd backend-comidas
 
 # Instalar dependencias
