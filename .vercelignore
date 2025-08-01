@@ -30,3 +30,19 @@ docs/
 *.pyo
 *.pyd
 .Python
+
+# Archivos de Git
+.git/
+.gitignore
+
+# Scripts de inicialización
+init_git.*
+*.bat
+*.sh
+
+# Archivos de desarrollo
+requirements.txt
+runtime.txt
+
+# Directorio de uploads (no necesario en serverless)
+uploads/
