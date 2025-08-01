@@ -159,7 +159,7 @@ class GeminiFoodDetector:
             },
             "foods_detected": [
                 {
-                    "name": "nombre_comida_en_ingles",
+                    "name": "nombre_comida_en_español",
                     "confidence": 0.95,
                     "portion_size": "mediana/pequeña/grande",
                     "estimated_weight_grams": 150,
@@ -206,7 +206,7 @@ class GeminiFoodDetector:
         2. Identifica TODOS los alimentos visibles en la imagen con alta precisión
         3. Proporciona puntuaciones de confianza (0.0 a 1.0) basadas en la claridad visual
         4. Estima tamaños de porciones y pesos de manera realista basándote en pistas visuales
-        5. Usa nombres en inglés para los alimentos (ej: "fish", "red_onion", "lettuce", "corn")
+        5. Usa nombres en ESPAÑOL para los alimentos (ej: "pescado", "cebolla_roja", "lechuga", "maíz")
         6. Proporciona coordenadas de bounding box como porcentajes (0.0 a 1.0)
         7. Calcula valores nutricionales precisos por 100g Y totales para la porción estimada
         8. INCLUYE las unidades en el análisis nutricional para claridad
@@ -215,6 +215,7 @@ class GeminiFoodDetector:
         11. Sé lo más preciso posible con todas las estimaciones
         12. TODAS las descripciones, recomendaciones, cuisine_type y textos descriptivos deben estar en ESPAÑOL
         13. Para cuisine_type usa términos en español: "peruana", "italiana", "mexicana", "china", "japonesa", etc.
+        14. IMPORTANTE: Los nombres de alimentos en el campo "name" deben estar en ESPAÑOL (ej: "pollo", "arroz", "plátano", "tomate", "cebolla")
 
         Devuelve SOLO la respuesta JSON, sin texto adicional o formato markdown.
         """
