@@ -1,24 +1,58 @@
-# API de Análisis de Códigos de Barras
+# API de Códigos de Barras
 
-## Descripción General
+## Descripción
+API para detección y análisis de códigos de barras en productos alimenticios, optimizada para el mercado peruano e internacional.
 
-La API ahora incluye capacidades avanzadas de análisis de códigos de barras, específicamente optimizada para productos disponibles en Perú. Utiliza una estrategia en cascada que combina múltiples fuentes de datos con análisis de IA.
+## Funcionalidades
 
-## Nuevos Endpoints
+### Fuentes de Datos
+1. **OpenFoodFacts** (Principal - Gratuito)
+   - Base de datos colaborativa mundial
+   - Información nutricional completa
+   - Siempre disponible
+   - No requiere registro
 
-### 1. POST `/api/v1/ai/barcode-scan`
+2. **UPC Database** (Opcional - No Recomendado)
+   - Requiere suscripción y tarjeta de crédito
+   - Solo se usa si se configura `UPC_DATABASE_API_KEY`
+   - No recomendado debido a costos
 
-Analiza un producto a partir de una imagen que contiene un código de barras.
+3. **Gemini AI** (Requerido)
+   - Análisis nutricional inteligente
+   - Requiere `GEMINI_API_KEY`
+
+## Limitaciones por Entorno
+
+### Desarrollo Local
+- ✅ Detección automática de códigos de barras desde imágenes
+- ✅ Todas las funcionalidades disponibles
+- ✅ OpenCV y pyzbar funcionan completamente
+
+### Producción (Vercel)
+- ❌ Detección automática de códigos de barras NO disponible
+- ✅ Entrada manual de códigos de barras SÍ funciona
+- ✅ Búsqueda en OpenFoodFacts y análisis con Gemini funcionan
+- ⚠️ Usuarios deben ingresar códigos manualmente
+
+## Endpoints
+
+### 1. `/api/v1/ai/barcode-scan`
+Analiza código de barras desde imagen o entrada manual.
+
+**Método:** `POST`
 
 **Parámetros:**
-- `file`: Imagen que contiene el código de barras (JPG, PNG, etc.)
+- `file` (opcional): Archivo de imagen con código de barras
+- `barcode` (opcional): Código de barras ingresado manualmente
 
-**Respuesta de ejemplo:**
+**Respuesta exitosa:**
 ```json
 {
   "success": true,
   "product_analysis": {
     "barcode": "7751271001234",
+    "detection_method": "manual",
+    "barcode_detection_available": false,
     "product_info": {
       "name": "Leche Gloria Entera",
       "brand": "Gloria",
@@ -83,6 +117,12 @@ Obtiene información sobre las capacidades de análisis de códigos de barras.
 {
   "success": true,
   "barcode_capabilities": {
+    "environment_capabilities": {
+      "automatic_detection": false,
+      "manual_input": true,
+      "openfoodfacts_search": true,
+      "gemini_analysis": true
+    },
     "supported_formats": [
       "EAN-13 (más común en Perú y el mundo)",
       "EAN-8 (productos pequeños)",
@@ -107,7 +147,11 @@ Obtiene información sobre las capacidades de análisis de códigos de barras.
         "coverage": "Buena para productos que no están en OpenFoodFacts",
         "priority": 2
       }
-    ]
+    ],
+    "usage_instructions": {
+      "production": "Ingresa el código de barras manualmente",
+      "development": "Puedes usar imagen o código manual"
+    }
   }
 }
 ```

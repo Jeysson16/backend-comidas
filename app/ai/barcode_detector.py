@@ -3,13 +3,23 @@ Detector de códigos de barras con integración a OpenFoodFacts
 Optimizado para productos peruanos e internacionales
 """
 
-import cv2
-import numpy as np
-from pyzbar import pyzbar
 import requests
 import logging
 from typing import Dict, Optional, List
 import json
+import os
+
+# Imports condicionales para evitar errores en Vercel
+try:
+    import cv2
+    import numpy as np
+    from pyzbar import pyzbar
+    BARCODE_LIBS_AVAILABLE = True
+except ImportError:
+    BARCODE_LIBS_AVAILABLE = False
+    cv2 = None
+    np = None
+    pyzbar = None
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +40,9 @@ class BarcodeDetector:
         self.headers = {
             'User-Agent': 'FoodDetectionAPI/1.0 (Peru Food Scanner)'
         }
+        
+        # API key para UPC Database (opcional)
+        self.upc_api_key = os.environ.get("UPC_DATABASE_API_KEY", None)
     
     def detect_barcode_from_image(self, image_data: bytes) -> List[str]:
         """
@@ -41,6 +54,10 @@ class BarcodeDetector:
         Returns:
             Lista de códigos de barras detectados
         """
+        if not BARCODE_LIBS_AVAILABLE:
+            logger.warning("Librerías de códigos de barras no disponibles en este entorno")
+            return []
+            
         try:
             # Convertir bytes a imagen OpenCV
             nparr = np.frombuffer(image_data, np.uint8)
