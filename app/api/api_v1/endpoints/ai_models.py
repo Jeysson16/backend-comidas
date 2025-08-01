@@ -1,7 +1,11 @@
 """
 Endpoints de la API para información de modelos de IA.
 Enfocado exclusivamente en Google Gemini.
-Incluye detección de alimentos por imagen y análisis de productos por código de barras.
+Incluye:
+- Detección de alimentos por imagen
+- Análisis de productos por código de barras
+- Análisis corporal y composición corporal por fotografía
+- Recomendaciones nutricionales personalizadas
 """
 
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
@@ -10,6 +14,7 @@ import logging
 
 from app.ai.food_detection import food_detector
 from app.services.product_service import ProductAnalysisService
+from app.ai.body_analysis_service import body_analysis_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -354,4 +359,175 @@ async def get_barcode_info():
         
     except Exception as e:
         logger.error(f"Error obteniendo información de códigos de barras: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/body-analysis", response_model=Dict)
+async def analyze_body_photo(
+    file: UploadFile = File(...),
+    age: Optional[int] = Form(None),
+    height: Optional[float] = Form(None),
+    weight: Optional[float] = Form(None),
+    gender: Optional[str] = Form(None),
+    activity_level: Optional[str] = Form(None),
+    dietary_restrictions: Optional[str] = Form(None)
+):
+    """
+    Analiza una fotografía corporal para estimar composición corporal y generar recomendaciones nutricionales.
+    
+    Parámetros opcionales del usuario:
+    - age: Edad en años
+    - height: Altura en centímetros
+    - weight: Peso en kilogramos
+    - gender: Sexo (masculino/femenino)
+    - activity_level: Nivel de actividad (sedentario/ligero/moderado/intenso)
+    - dietary_restrictions: Restricciones dietéticas
+    """
+    try:
+        # Validar tipo de archivo
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400, 
+                detail="El archivo debe ser una imagen"
+            )
+        
+        # Leer datos de la imagen
+        image_data = await file.read()
+        
+        # Preparar información del usuario
+        user_info = {}
+        if age is not None:
+            user_info["age"] = age
+        if height is not None:
+            user_info["height"] = height
+        if weight is not None:
+            user_info["weight"] = weight
+        if gender is not None:
+            user_info["gender"] = gender
+        if activity_level is not None:
+            user_info["activity_level"] = activity_level
+        if dietary_restrictions is not None:
+            user_info["dietary_restrictions"] = dietary_restrictions
+        
+        # Realizar análisis corporal completo
+        result = body_analysis_service.analyze_body_photo(image_data, user_info)
+        
+        return {
+            "success": True,
+            "body_analysis": result,
+            "filename": file.filename,
+            "user_info_provided": user_info,
+            "message": "Análisis corporal completado exitosamente"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error en análisis corporal: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/body-analysis-info", response_model=Dict)
+async def get_body_analysis_info():
+    """
+    Obtiene información sobre las capacidades de análisis corporal.
+    """
+    try:
+        analysis_info = body_analysis_service.get_service_info()
+        
+        return {
+            "success": True,
+            "body_analysis_capabilities": analysis_info,
+            "message": "Información de capacidades de análisis corporal obtenida exitosamente"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo información de análisis corporal: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/body-metrics-info", response_model=Dict)
+async def get_body_metrics_info():
+    """
+    Obtiene información detallada sobre las métricas corporales que se pueden analizar.
+    """
+    try:
+        metrics_info = {
+            "primary_metrics": {
+                "body_fat_percentage": {
+                    "description": "Estimación del porcentaje de grasa corporal",
+                    "accuracy": "Estimativo basado en análisis visual",
+                    "range": "5-50%",
+                    "factors": ["Definición muscular visible", "Distribución de grasa", "Tipo corporal"]
+                },
+                "body_type": {
+                    "description": "Clasificación del somatotipo corporal",
+                    "categories": ["Ectomorfo", "Mesomorfo", "Endomorfo", "Mixto"],
+                    "characteristics": {
+                        "ectomorfo": "Delgado, metabolismo rápido, dificultad para ganar peso",
+                        "mesomorfo": "Atlético, gana músculo fácilmente, metabolismo eficiente",
+                        "endomorfo": "Tendencia a acumular grasa, metabolismo lento"
+                    }
+                },
+                "muscle_mass_level": {
+                    "description": "Evaluación del nivel de masa muscular",
+                    "levels": ["Bajo", "Medio", "Alto"],
+                    "indicators": ["Definición muscular", "Volumen aparente", "Proporción corporal"]
+                }
+            },
+            "secondary_metrics": {
+                "posture_assessment": {
+                    "description": "Evaluación básica de la postura corporal",
+                    "aspects": ["Alineación de hombros", "Curvatura espinal aparente", "Posición de cabeza"]
+                },
+                "fitness_level": {
+                    "description": "Impresión general del nivel de condición física",
+                    "indicators": ["Tono muscular", "Definición", "Proporción corporal"]
+                },
+                "health_indicators": {
+                    "description": "Indicadores visuales de salud general",
+                    "aspects": ["Apariencia de la piel", "Distribución de peso", "Vitalidad general"]
+                }
+            },
+            "nutritional_recommendations": {
+                "caloric_needs": "Estimación de necesidades calóricas diarias",
+                "macronutrient_distribution": "Distribución recomendada de proteínas, carbohidratos y grasas",
+                "meal_timing": "Recomendaciones de horarios y frecuencia de comidas",
+                "specific_foods": "Alimentos recomendados según objetivos corporales"
+            },
+            "accuracy_factors": [
+                "Calidad y resolución de la imagen",
+                "Iluminación adecuada",
+                "Ángulo de la fotografía (frontal o lateral)",
+                "Ropa ajustada o mínima para mejor evaluación",
+                "Información adicional del usuario (edad, altura, peso)"
+            ],
+            "limitations": [
+                "Análisis estimativo, no diagnóstico médico",
+                "Precisión variable según calidad de imagen",
+                "No reemplaza mediciones profesionales",
+                "Requiere validación con profesionales de la salud"
+            ],
+            "best_practices": {
+                "photo_guidelines": [
+                    "Tomar foto de cuerpo completo",
+                    "Usar buena iluminación natural",
+                    "Mantener postura natural y relajada",
+                    "Usar ropa ajustada o deportiva",
+                    "Incluir vista frontal y/o lateral"
+                ],
+                "data_input": [
+                    "Proporcionar edad para mejor precisión",
+                    "Incluir altura y peso si están disponibles",
+                    "Especificar nivel de actividad física",
+                    "Mencionar restricciones dietéticas relevantes"
+                ]
+            }
+        }
+        
+        return {
+            "success": True,
+            "body_metrics_info": metrics_info,
+            "message": "Información detallada de métricas corporales obtenida exitosamente"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo información de métricas corporales: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
