@@ -6,7 +6,6 @@ con recomendaciones nutricionales personalizadas.
 import logging
 from typing import Dict, List, Optional
 from .body_analyzer import body_analyzer
-from .gemini_ai import gemini_ai
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,6 @@ class BodyAnalysisService:
     
     def __init__(self):
         self.body_analyzer = body_analyzer
-        self.gemini_ai = gemini_ai
         logger.info("BodyAnalysisService inicializado")
     
     def analyze_body_photo(self, image_data: bytes, user_info: Dict = None) -> Dict:
@@ -78,8 +76,8 @@ class BodyAnalysisService:
             prompt = self._create_nutrition_prompt(body_analysis, user_info)
             
             # Generar recomendaciones con Gemini
-            if self.gemini_ai.model:
-                response = self.gemini_ai.model.generate_content(prompt)
+            if self.body_analyzer.model:
+                response = self.body_analyzer.model.generate_content(prompt)
                 recommendations = self._process_nutrition_response(response.text)
             else:
                 recommendations = self._get_default_nutrition_recommendations()
