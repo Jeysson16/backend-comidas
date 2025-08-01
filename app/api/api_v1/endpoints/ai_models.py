@@ -1,16 +1,21 @@
 """
 Endpoints de la API para información de modelos de IA.
 Enfocado exclusivamente en Google Gemini.
+Incluye detección de alimentos por imagen y análisis de productos por código de barras.
 """
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
-from typing import Dict, List
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from typing import Dict, List, Optional
 import logging
 
 from app.ai.food_detection import food_detector
+from app.services.product_service import ProductAnalysisService
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
+
+# Instancia del servicio de análisis de productos
+product_service = ProductAnalysisService()
 
 @router.get("/model-info", response_model=Dict)
 async def get_model_info():
@@ -224,4 +229,123 @@ async def get_system_health():
         
     except Exception as e:
         logger.error(f"Error obteniendo salud del sistema: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/barcode-scan", response_model=Dict)
+async def scan_barcode(file: UploadFile = File(...)):
+    """
+    Analiza un producto a partir de una imagen de código de barras.
+    Detecta el código de barras, obtiene información del producto y realiza análisis nutricional.
+    """
+    try:
+        # Validar tipo de archivo
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(
+                status_code=400, 
+                detail="El archivo debe ser una imagen"
+            )
+        
+        # Leer datos de la imagen
+        image_data = await file.read()
+        
+        # Analizar producto por código de barras
+        result = await product_service.analyze_product_by_barcode(image_data)
+        
+        return {
+            "success": True,
+            "product_analysis": result,
+            "filename": file.filename,
+            "message": "Análisis de código de barras completado exitosamente"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error en análisis de código de barras: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/barcode-manual", response_model=Dict)
+async def analyze_barcode_manual(barcode: str = Form(...)):
+    """
+    Analiza un producto a partir de un código de barras ingresado manualmente.
+    Obtiene información del producto y realiza análisis nutricional.
+    """
+    try:
+        # Validar formato del código de barras
+        if not barcode.isdigit() or len(barcode) not in [8, 12, 13, 14]:
+            raise HTTPException(
+                status_code=400,
+                detail="El código de barras debe contener solo números y tener 8, 12, 13 o 14 dígitos"
+            )
+        
+        # Analizar producto por código de barras manual
+        result = await product_service.analyze_product_by_manual_barcode(barcode)
+        
+        return {
+            "success": True,
+            "product_analysis": result,
+            "barcode": barcode,
+            "message": "Análisis de código de barras manual completado exitosamente"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error en análisis de código de barras manual: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/barcode-info", response_model=Dict)
+async def get_barcode_info():
+    """
+    Obtiene información sobre las capacidades de análisis de códigos de barras.
+    """
+    try:
+        barcode_info = {
+            "supported_formats": [
+                "EAN-13 (más común en Perú y el mundo)",
+                "EAN-8 (productos pequeños)",
+                "UPC-A (productos de Estados Unidos)",
+                "UPC-E (versión compacta de UPC-A)"
+            ],
+            "peru_specific": {
+                "country_code": "775",
+                "description": "Los productos fabricados en Perú tienen códigos que empiezan con 775",
+                "coverage": "Buena cobertura en OpenFoodFacts para productos peruanos"
+            },
+            "data_sources": [
+                {
+                    "name": "OpenFoodFacts",
+                    "description": "Base de datos colaborativa mundial de productos alimentarios",
+                    "coverage": "Excelente para productos internacionales y peruanos conocidos",
+                    "priority": 1
+                },
+                {
+                    "name": "UPC Database",
+                    "description": "Base de datos comercial de códigos UPC/EAN",
+                    "coverage": "Buena para productos que no están en OpenFoodFacts",
+                    "priority": 2
+                }
+            ],
+            "ai_analysis": {
+                "provider": "Google Gemini 1.5 Flash",
+                "capabilities": [
+                    "Análisis nutricional detallado",
+                    "Evaluación de nivel de procesamiento",
+                    "Recomendaciones de salud",
+                    "Análisis de sostenibilidad",
+                    "Comparación con alternativas saludables"
+                ]
+            },
+            "fallback_strategy": "Si no se encuentra el código, se puede usar detección de imagen del producto",
+            "response_time": "2-5 segundos promedio"
+        }
+        
+        return {
+            "success": True,
+            "barcode_capabilities": barcode_info,
+            "message": "Información de capacidades de códigos de barras obtenida exitosamente"
+        }
+        
+    except Exception as e:
+        logger.error(f"Error obteniendo información de códigos de barras: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
