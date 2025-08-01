@@ -3,13 +3,20 @@ Analizador de composición corporal usando Gemini AI.
 Procesa fotografías del usuario para estimar métricas corporales.
 """
 
-import google.generativeai as genai
 import os
 import logging
 from typing import Dict, List, Optional
 import base64
 from PIL import Image
 import io
+
+# Imports condicionales para compatibilidad con Vercel
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+    genai = None
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +29,20 @@ class BodyAnalyzer:
         self.api_key = os.getenv("GEMINI_API_KEY")
         self.model_name = "gemini-1.5-flash"
         
-        if self.api_key:
-            genai.configure(api_key=self.api_key)
-            self.model = genai.GenerativeModel(self.model_name)
-            logger.info("BodyAnalyzer inicializado con Gemini AI")
+        if self.api_key and GEMINI_AVAILABLE:
+            try:
+                genai.configure(api_key=self.api_key)
+                self.model = genai.GenerativeModel(self.model_name)
+                logger.info("BodyAnalyzer inicializado con Gemini AI")
+            except Exception as e:
+                logger.error(f"Error inicializando Gemini: {str(e)}")
+                self.model = None
         else:
             self.model = None
-            logger.warning("GEMINI_API_KEY no configurada - usando modo simulación")
+            if not GEMINI_AVAILABLE:
+                logger.warning("google-generativeai no disponible - usando modo simulación")
+            else:
+                logger.warning("GEMINI_API_KEY no configurada - usando modo simulación")
     
     def analyze_body_composition(self, image_data: bytes, user_info: Dict = None) -> Dict:
         """

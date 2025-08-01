@@ -71,7 +71,7 @@ async def test_detection(file: UploadFile = File(...)):
         image_data = await file.read()
         
         # Realizar detección
-        result = food_detector.detect_objects(image_data)
+        result = await food_detector.detect_objects(image_data)
         
         return {
             "success": True,

@@ -39,7 +39,7 @@ class FoodDetectionSystem:
             else:
                 logger.warning("⚠️ GEMINI_API_KEY no configurada, usando modo simulación")
 
-    def detect_objects(self, image_data: bytes) -> Dict:
+    async def detect_objects(self, image_data: bytes) -> Dict:
         """
         Detecta objetos de comida en una imagen usando Gemini.
         
@@ -51,7 +51,7 @@ class FoodDetectionSystem:
         """
         try:
             if self.detector:
-                return self.detector.detect_food(image_data)
+                return await self.detector.detect_food(image_data)
             else:
                 logger.info("🎭 Usando detección simulada (Gemini no configurado)")
                 return self._simulate_detection()
@@ -224,7 +224,7 @@ class ImageAnalyzer:
                 image_data = f.read()
             
             # Usar el nuevo sistema
-            result = self.food_detector.detect_objects(image_data)
+            result = await self.food_detector.detect_objects(image_data)
             
             return result
             

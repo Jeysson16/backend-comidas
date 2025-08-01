@@ -7,7 +7,8 @@ import base64
 import json
 import logging
 from typing import Dict, List, Optional, Tuple
-import requests
+import aiohttp
+import asyncio
 import io
 
 from app.core.config import settings
@@ -85,7 +86,7 @@ class GeminiFoodDetector:
             "olive_oil": 15, "avocado": 150
         }
 
-    def detect_food(self, image_data: bytes) -> Dict:
+    async def detect_food(self, image_data: bytes) -> Dict:
         """
         Detect food items in an image using Gemini API.
         
@@ -127,15 +128,15 @@ class GeminiFoodDetector:
                 }
             }
             
-            # Make API request
+            # Make API request using aiohttp
             headers = {
                 "Content-Type": "application/json"
             }
             
-            response = requests.post(self.api_url, json=payload, headers=headers)
-            response.raise_for_status()
-            
-            result = response.json()
+            async with aiohttp.ClientSession() as session:
+                async with session.post(self.api_url, json=payload, headers=headers) as response:
+                    response.raise_for_status()
+                    result = await response.json()
             
             # Process Gemini response
             return self._process_gemini_response(result)
