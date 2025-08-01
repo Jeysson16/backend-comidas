@@ -7,7 +7,7 @@ import base64
 import json
 import logging
 from typing import Dict, List, Optional, Tuple
-import aiohttp
+import requests
 import asyncio
 import io
 
@@ -128,15 +128,14 @@ class GeminiFoodDetector:
                 }
             }
             
-            # Make API request using aiohttp
+            # Make API request using requests
             headers = {
                 "Content-Type": "application/json"
             }
             
-            async with aiohttp.ClientSession() as session:
-                async with session.post(self.api_url, json=payload, headers=headers) as response:
-                    response.raise_for_status()
-                    result = await response.json()
+            response = requests.post(self.api_url, json=payload, headers=headers)
+            response.raise_for_status()
+            result = response.json()
             
             # Process Gemini response
             return self._process_gemini_response(result)
