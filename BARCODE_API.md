@@ -120,15 +120,18 @@ Obtiene información sobre las capacidades de análisis de códigos de barras.
 - Optimizado para códigos peruanos (775) e internacionales
 
 ### 2. Búsqueda de Información del Producto
-**Cascada de fuentes:**
-1. **OpenFoodFacts** (Prioridad 1)
+**Fuente principal:**
+1. **OpenFoodFacts** (Siempre disponible - Gratuito)
    - Base de datos colaborativa mundial
    - Excelente para productos peruanos conocidos
    - Información nutricional detallada
+   - No requiere API key ni registro
 
-2. **UPC Database** (Prioridad 2)
+**Fuente opcional:**
+2. **UPC Database** (Solo si se configura - Requiere tarjeta)
    - Base de datos comercial
    - Respaldo para productos no encontrados en OpenFoodFacts
+   - **No recomendado** por requerir registro con tarjeta de crédito
 
 ### 3. Análisis con IA (Gemini)
 - Análisis nutricional detallado
@@ -154,12 +157,14 @@ Obtiene información sobre las capacidades de análisis de códigos de barras.
 ## Variables de Entorno Requeridas
 
 ```env
-# Gemini AI (requerido)
+# Gemini AI (REQUERIDO para análisis nutricional)
 GEMINI_API_KEY=tu_api_key_de_gemini
 
-# UPC Database (opcional, para respaldo)
-UPC_DATABASE_API_KEY=tu_api_key_opcional
+# UPC Database (COMPLETAMENTE OPCIONAL - no recomendado por requerir tarjeta)
+# UPC_DATABASE_API_KEY=tu_api_key_opcional
 ```
+
+**Nota importante:** La API funciona perfectamente solo con OpenFoodFacts (gratuito) y Gemini. UPC Database es opcional y requiere registro con tarjeta de crédito.
 
 ## Casos de Uso
 

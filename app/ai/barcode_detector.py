@@ -72,7 +72,7 @@ class BarcodeDetector:
     def get_product_info(self, barcode: str) -> Dict:
         """
         Obtiene información del producto usando el código de barras
-        Prioriza OpenFoodFacts y usa UPC Database como respaldo
+        Prioriza OpenFoodFacts (gratuito) y opcionalmente usa UPC Database si está configurado
         
         Args:
             barcode: Código de barras del producto
@@ -80,23 +80,26 @@ class BarcodeDetector:
         Returns:
             Información del producto
         """
-        # Intentar con OpenFoodFacts primero
+        # Intentar con OpenFoodFacts primero (siempre disponible)
         product_info = self._get_from_openfoodfacts(barcode)
         
         if product_info and product_info.get("found"):
             logger.info(f"Producto encontrado en OpenFoodFacts: {barcode}")
             return product_info
         
-        # Si no se encuentra, intentar con UPC Database
-        logger.info(f"Producto no encontrado en OpenFoodFacts, intentando UPC Database: {barcode}")
-        product_info = self._get_from_upc_database(barcode)
-        
-        if product_info and product_info.get("found"):
-            logger.info(f"Producto encontrado en UPC Database: {barcode}")
-            return product_info
+        # Solo intentar UPC Database si se configuró API key (opcional)
+        if self.upc_api_key:
+            logger.info(f"Producto no encontrado en OpenFoodFacts, intentando UPC Database: {barcode}")
+            product_info = self._get_from_upc_database(barcode)
+            
+            if product_info and product_info.get("found"):
+                logger.info(f"Producto encontrado en UPC Database: {barcode}")
+                return product_info
+        else:
+            logger.info("UPC Database no configurado (API key no disponible)")
         
         # Si no se encuentra en ninguna API
-        logger.warning(f"Producto no encontrado en ninguna base de datos: {barcode}")
+        logger.warning(f"Producto no encontrado en las bases de datos disponibles: {barcode}")
         return self._create_unknown_product_response(barcode)
     
     def _get_from_openfoodfacts(self, barcode: str) -> Dict:
@@ -207,10 +210,11 @@ class BarcodeDetector:
         return {
             "found": False,
             "barcode": barcode,
-            "message": "Producto no encontrado en las bases de datos",
+            "message": "Producto no encontrado en OpenFoodFacts",
             "suggestion": "Puedes usar la detección por imagen como alternativa",
             "is_peruvian_product": any(barcode.startswith(code) for code in self.peru_country_codes),
-            "country_hint": "Producto peruano" if any(barcode.startswith(code) for code in self.peru_country_codes) else "Producto internacional"
+            "country_hint": "Producto peruano" if any(barcode.startswith(code) for code in self.peru_country_codes) else "Producto internacional",
+            "note": "OpenFoodFacts es una base de datos colaborativa - puedes contribuir agregando este producto"
         }
     
     def analyze_barcode_format(self, barcode: str) -> Dict:

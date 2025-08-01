@@ -317,13 +317,19 @@ async def get_barcode_info():
                     "name": "OpenFoodFacts",
                     "description": "Base de datos colaborativa mundial de productos alimentarios",
                     "coverage": "Excelente para productos internacionales y peruanos conocidos",
-                    "priority": 1
+                    "cost": "Completamente gratuito",
+                    "api_key_required": False,
+                    "priority": 1,
+                    "status": "Siempre disponible"
                 },
                 {
                     "name": "UPC Database",
                     "description": "Base de datos comercial de códigos UPC/EAN",
                     "coverage": "Buena para productos que no están en OpenFoodFacts",
-                    "priority": 2
+                    "cost": "Requiere suscripción y tarjeta de crédito",
+                    "api_key_required": True,
+                    "priority": 2,
+                    "status": "Opcional - No recomendado"
                 }
             ],
             "ai_analysis": {
