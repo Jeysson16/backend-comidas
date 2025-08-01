@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="Food Detection API con Google Gemini",
     description="Backend especializado en detección de alimentos usando Google Gemini 1.5 Flash",
-    version="2.0.0",
+    version="2.0.1",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -65,7 +65,7 @@ async def root():
     """Endpoint raíz con información del sistema"""
     return {
         "message": "Food Detection API con Google Gemini",
-        "version": "2.0.0",
+        "version": "2.0.1",
         "ai_backend": "Google Gemini 1.5 Flash",
         "architecture": "Backend especializado en IA",
         "database": "Firebase (manejado por frontend)",
@@ -98,7 +98,7 @@ async def system_info():
     return {
         "api": {
             "name": "Food Detection API",
-            "version": "2.0.0",
+            "version": "2.0.1",
             "ai_backend": "Google Gemini 1.5 Flash",
             "purpose": "Specialized AI backend for food detection"
         },
